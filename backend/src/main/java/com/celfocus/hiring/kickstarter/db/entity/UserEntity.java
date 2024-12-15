@@ -1,8 +1,6 @@
 package com.celfocus.hiring.kickstarter.db.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "USERS")
@@ -12,6 +10,9 @@ public class UserEntity {
     private String username;
     private String password;
     private String permission;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CartEntity cartEntity;
 
     public UserEntity(Integer id, String username, String password, String permission) {
         this.id = id;
