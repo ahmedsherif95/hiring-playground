@@ -80,7 +80,7 @@ class CartConcurrencyIntegrationTest {
         // Verify all responses are successful
         for (Future<ResultActions> future : futures) {
             ResultActions result = future.get();
-            result.andExpect(status().isCreated());
+            result.andExpect(status().isOk());
         }
     }
 
