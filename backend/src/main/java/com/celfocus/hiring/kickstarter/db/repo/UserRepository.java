@@ -2,10 +2,10 @@ package com.celfocus.hiring.kickstarter.db.repo;
 
 import com.celfocus.hiring.kickstarter.db.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
+@Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
-    List<UserEntity> findByUsername(String username);
-    List<UserEntity> findByUsernameAndPassword(String username, String password);
+    UserEntity findByUsername(String username);
+    UserEntity findByUsernameAndPassword(String username, String password);
 }
