@@ -12,9 +12,16 @@ import java.util.List;
 public class CartEntity extends Cart<CartItemEntity> implements Serializable {
 
     private Long id;
-    @OneToOne
-    @JoinColumn(referencedColumnName = "user_id")
-    private UserEntity user;
+
+    @OneToOne(mappedBy = "cartEntity")
+    private UserEntity userEntity;
+
+
+    public CartEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
+    }
+
+    public CartEntity() {}
 
     @Id
     @Column(name = "ID")
