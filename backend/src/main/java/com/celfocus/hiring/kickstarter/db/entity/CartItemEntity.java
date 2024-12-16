@@ -13,6 +13,9 @@ public class CartItemEntity extends CartItem implements Serializable {
 
     private CartEntity cart;
 
+    @Version
+    private Integer version;
+
     public CartItemEntity() {
     }
 
