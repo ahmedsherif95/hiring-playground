@@ -9,9 +9,12 @@ import com.celfocus.hiring.kickstarter.db.repo.CartRepository;
 import com.celfocus.hiring.kickstarter.db.repo.ProductRepository;
 import com.celfocus.hiring.kickstarter.domain.Cart;
 import com.celfocus.hiring.kickstarter.domain.CartItem;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ConcurrentModificationException;
 
 @Service
 @Transactional
@@ -49,12 +52,19 @@ public class CartService {
         cartItem.setCartId(cart.getId());
         cartItem.setCart(cart);
         cartItem.setPrice(product.getPrice());
-        cartItemRepository.save(cartItem);
+        try {
+            cartItemRepository.save(cartItem);
+        } catch (OptimisticLockException e) {
+            throw new ConcurrentModificationException("The item you are trying to add has been modified by another user.");
+        }
     }
 
     private void updateItemQuantity(CartItemEntity item, int byCount) {
-        setItemQuantity(item, item.getQuantity() + byCount);
-    }
+        try {
+            setItemQuantity(item, item.getQuantity() + byCount);
+        } catch (OptimisticLockException e) {
+            throw new ConcurrentModificationException("The cart item was modified by another user.");
+        }    }
 
     private void setItemQuantity(CartItemEntity item, int quantity) {
         item.setQuantity(quantity);
@@ -62,7 +72,11 @@ public class CartService {
     }
 
     public void clearCart(String username) {
-        cartRepository.deleteByUserId(username);
+        try {
+            cartRepository.deleteByUserId(username);
+        } catch (OptimisticLockException e) {
+            throw new ConcurrentModificationException("The cart was modified by another user while attempting to clear it.");
+        }
     }
 
     public Cart<? extends CartItem> getCart(String username) {
@@ -72,9 +86,14 @@ public class CartService {
     }
 
     public void removeItemFromCart(String username, String itemId) {
-        cartRepository.findByUserId(username)
-                .ifPresent(cart -> cartItemRepository.deleteById(new CartItemPK(itemId, cart.getId())));
+        try {
+            cartRepository.findByUserId(username)
+                    .ifPresent(cart -> cartItemRepository.deleteById(new CartItemPK(itemId, cart.getId())));
+        } catch (OptimisticLockException e) {
+            throw new ConcurrentModificationException("The cart item was modified by another user while attempting to remove it.");
+        }
     }
+
 
     private Cart<? extends CartItem> mapToCart(CartEntity cartEntity) {
         Cart<CartItemEntity> cart = new Cart<>();
