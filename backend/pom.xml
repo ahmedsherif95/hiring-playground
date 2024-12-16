@@ -38,6 +38,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>3.3.4</version> <!-- Ensure this matches your Spring Boot version -->
 			<scope>test</scope>
 		</dependency>
 
@@ -69,11 +70,13 @@
 			<version>6.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<!-- Spring Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
 		<!-- JWT Library -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -91,6 +94,26 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.12.6</version>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Update JUnit to version compatible with Spring Boot 3.x -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.9.0</version> <!-- Updated version -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.9.0</version> <!-- Updated version -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<version>1.9.0</version> <!-- Updated version -->
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
