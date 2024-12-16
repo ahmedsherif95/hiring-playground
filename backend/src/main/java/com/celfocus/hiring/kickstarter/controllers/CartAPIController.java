@@ -1,4 +1,4 @@
-package com.celfocus.hiring.kickstarter.api;
+package com.celfocus.hiring.kickstarter.controllers;
 
 import com.celfocus.hiring.kickstarter.api.CartAPI;
 import com.celfocus.hiring.kickstarter.api.CartService;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ConcurrentModificationException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -40,15 +41,27 @@ public class CartAPIController implements CartAPI {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated() and hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> addItemToCart(String username, CartItemInput itemInput) {
-        cartService.addItemToCart(username, itemInput);
-        return ResponseEntity.status(201).build();
+        try {
+            validateUserAccess(username);
+            cartService.addItemToCart(username, itemInput);
+            return ResponseEntity.status(201).build();
+        } catch (ConcurrentModificationException e) {
+            return ResponseEntity.status(409).body(null);
+        }
     }
 
     @Override
+    @PreAuthorize("isAuthenticated() and hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> clearCart(String username) {
-        cartService.clearCart(username);
-        return ResponseEntity.status(204).build();
+        try {
+            validateUserAccess(username);
+            cartService.clearCart(username);
+            return ResponseEntity.status(204).build();
+        } catch (ConcurrentModificationException e) {
+            return ResponseEntity.status(409).body(null);
+        }
     }
 
     @Override
@@ -60,9 +73,15 @@ public class CartAPIController implements CartAPI {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated() and hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> removeItemFromCart(String username, String itemId) {
-        cartService.removeItemFromCart(username, itemId);
-        return ResponseEntity.status(204).build();
+        try {
+            validateUserAccess(username);
+            cartService.removeItemFromCart(username, itemId);
+            return ResponseEntity.status(204).build();
+        } catch (ConcurrentModificationException e) {
+            return ResponseEntity.status(409).body(null);
+        }
     }
 
     private CartResponse mapToCartResponse(Cart<? extends CartItem> cart) {
