@@ -1,5 +1,8 @@
 package com.celfocus.hiring.kickstarter.api;
 
+import com.celfocus.hiring.kickstarter.api.CartAPI;
+import com.celfocus.hiring.kickstarter.api.CartService;
+import com.celfocus.hiring.kickstarter.api.ProductService;
 import com.celfocus.hiring.kickstarter.api.dto.CartItemInput;
 import com.celfocus.hiring.kickstarter.api.dto.CartItemResponse;
 import com.celfocus.hiring.kickstarter.api.dto.CartResponse;
@@ -7,6 +10,9 @@ import com.celfocus.hiring.kickstarter.domain.Cart;
 import com.celfocus.hiring.kickstarter.domain.CartItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +52,9 @@ public class CartAPIController implements CartAPI {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated() and hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CartResponse> getCart(String username) {
+        validateUserAccess(username);
         var cart = cartService.getCart(username);
         return ResponseEntity.ok(mapToCartResponse(cart));
     }
@@ -64,5 +72,14 @@ public class CartAPIController implements CartAPI {
     private CartItemResponse mapToCartItemResponse(CartItem item) {
         var product = productService.getProduct(item.getItemId());
         return new CartItemResponse(item.getItemId(), item.getQuantity(), product.orElseThrow().getPrice(), product.orElseThrow().getName());
+    }
+
+    public void validateUserAccess(String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUsername = authentication.getName();
+
+        if (!loggedInUsername.equals(username)) {
+            throw new SecurityException("You are not authorized to access this cart.");
+        }
     }
 }
